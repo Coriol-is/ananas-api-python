@@ -19,9 +19,7 @@ def test_client_authenticates_and_sends_bearer_token() -> None:
         assert request.headers["Authorization"] == "Bearer token"
         return httpx.Response(200, json={"ok": True}, request=request)
 
-    http = httpx.Client(
-        base_url="https://api.example.test", transport=httpx.MockTransport(handler)
-    )
+    http = httpx.Client(base_url="https://api.example.test", transport=httpx.MockTransport(handler))
     client = AnanasClient(
         base_url="https://api.example.test",
         api_key="key",
@@ -39,9 +37,7 @@ def test_existing_token_skips_authentication() -> None:
         assert request.headers["Authorization"] == "Bearer existing"
         return httpx.Response(204, request=request)
 
-    http = httpx.Client(
-        base_url="https://api.example.test", transport=httpx.MockTransport(handler)
-    )
+    http = httpx.Client(base_url="https://api.example.test", transport=httpx.MockTransport(handler))
     client = AnanasClient(
         base_url="https://api.example.test", access_token="existing", http_client=http
     )
@@ -53,9 +49,7 @@ def test_api_errors_include_status_and_body() -> None:
     def handler(request: httpx.Request) -> httpx.Response:
         return httpx.Response(400, json={"message": "Invalid request"}, request=request)
 
-    http = httpx.Client(
-        base_url="https://api.example.test", transport=httpx.MockTransport(handler)
-    )
+    http = httpx.Client(base_url="https://api.example.test", transport=httpx.MockTransport(handler))
     client = AnanasClient(
         base_url="https://api.example.test", access_token="token", http_client=http
     )
@@ -70,4 +64,3 @@ def test_api_errors_include_status_and_body() -> None:
 def test_credentials_are_required() -> None:
     with pytest.raises(ValueError, match="provide access_token"):
         AnanasClient(base_url="https://api.example.test")
-

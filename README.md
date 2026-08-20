@@ -57,7 +57,21 @@ source .venv/bin/activate
 pip install -e '.[dev]'
 pytest
 ruff check .
+ruff format --check .
 ```
+
+## Releasing
+
+Releases are automated from version tags. Update `project.version` in
+`pyproject.toml`, merge the change, and push a matching tag such as `v0.2.0`.
+The release workflow verifies the tag, builds and validates the source and
+wheel distributions, adds build-provenance attestations, attaches the files to
+a GitHub Release, and publishes them to PyPI using trusted publishing.
+
+Before the first release, configure a PyPI trusted publisher for this
+repository with workflow `release.yml` and environment `pypi`. GitHub Packages
+does not provide a PyPI-compatible package registry, so installable Python
+packages are published to PyPI while GitHub hosts the signed release assets.
 
 ## Scope
 
@@ -68,4 +82,3 @@ This project is not affiliated with or endorsed by Ananas. Ananas names and trad
 ## License
 
 [MIT](LICENSE)
-

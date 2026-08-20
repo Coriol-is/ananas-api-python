@@ -34,9 +34,7 @@ class AnanasClient:
             raise ValueError("base_url must not be empty")
         credentials = (api_key, client_id, client_secret)
         if not access_token and not all(credentials):
-            raise ValueError(
-                "provide access_token or all of api_key, client_id, and client_secret"
-            )
+            raise ValueError("provide access_token or all of api_key, client_id, and client_secret")
 
         self.api_key = api_key
         self.client_id = client_id
@@ -45,9 +43,7 @@ class AnanasClient:
         self._access_token = access_token
         self._token_expires_at: Optional[float] = None
         self._owns_client = http_client is None
-        self._client = http_client or httpx.Client(
-            base_url=base_url.rstrip("/"), timeout=timeout
-        )
+        self._client = http_client or httpx.Client(base_url=base_url.rstrip("/"), timeout=timeout)
 
     def __enter__(self) -> "AnanasClient":
         return self

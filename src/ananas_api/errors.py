@@ -28,4 +28,3 @@ class AnanasAPIError(Exception):
 
 class AnanasAuthenticationError(AnanasAPIError):
     """Authentication with the Ananas API failed."""
-
