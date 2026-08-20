@@ -23,10 +23,9 @@ with AnanasClient(
     client_id="your-client-id",
     client_secret="your-client-secret",
 ) as ananas:
-    products = ananas.get(
-        "/product/api/v1/merchant-integration/products",
-        params={"page": 0, "size": 100},
-    )
+    products = ananas.products.get_products(page=0, size=100)
+    for product in products:
+        print(product.id, product.name, product.stock_level)
 ```
 
 You can also supply an existing bearer token:
@@ -48,6 +47,41 @@ Credentials are never read implicitly. Load them from environment variables or a
 ## Errors
 
 Non-successful responses raise `AnanasAPIError`, which exposes `status_code`, `response`, and the parsed response body when available. Authentication failures raise `AnanasAuthenticationError`.
+
+## Named APIs and typed models
+
+All operations and component schemas in the published Ananas OpenAPI 1.0.0
+document have typed coverage:
+
+- `client.products` — product listing/import/update, product types, and EAN checks
+- `client.discounts` — schedule, update, query, and cancel discounts
+- `client.payments` — warehouses, invoices, corrections, prices, and document URLs
+
+Request models validate field types, identifiers, enums, date formats, date
+ranges, page sizes, and documented list limits before sending a request.
+Responses are parsed into Pydantic models with Python-friendly names while
+preserving the API's JSON aliases.
+
+```python
+from ananas_api.models.products import ProductRequest
+
+result = ananas.products.import_or_update_products(
+    ProductRequest(
+        name="Example product",
+        ean="8600000000000",
+        sku="SKU-001",
+        stockLevel=10,
+        basePrice=1999.0,
+    )
+)
+```
+
+Product collection endpoints also provide automatic pagination:
+
+```python
+for product in ananas.products.iter_products(size=250):
+    print(product.sku)
+```
 
 ## Development
 
@@ -75,7 +109,10 @@ packages are published to PyPI while GitHub hosts the signed release assets.
 
 ## Scope
 
-The official API currently covers authorization, products, warehouses, payments, discounts, orders, and shipments. Endpoint-specific helpers and generated models can be added incrementally while `request`, `get`, `post`, `put`, `patch`, and `delete` keep the entire API accessible today.
+The published OpenAPI document currently covers authorization, products,
+warehouses, payments, and discounts. The lower-level `request`, `get`, `post`,
+`put`, `patch`, and `delete` methods remain available for forward compatibility
+with endpoints added before the next library release.
 
 This project is not affiliated with or endorsed by Ananas. Ananas names and trademarks belong to their respective owners.
 

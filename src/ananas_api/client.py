@@ -4,11 +4,17 @@ from __future__ import annotations
 
 import time
 from types import TracebackType
-from typing import Any, Optional, Type, Union
+from typing import TYPE_CHECKING, Any, Optional, Type, Union
 
 import httpx
 
 from .errors import AnanasAPIError, AnanasAuthenticationError
+from .models.auth import TokenRequest, TokenResponse
+
+if TYPE_CHECKING:
+    from .resources.discounts import DiscountsResource
+    from .resources.payments import PaymentsResource
+    from .resources.products import ProductsResource
 
 JSON = Union[dict[str, Any], list[Any], str, int, float, bool, None]
 
@@ -44,6 +50,9 @@ class AnanasClient:
         self._token_expires_at: Optional[float] = None
         self._owns_client = http_client is None
         self._client = http_client or httpx.Client(base_url=base_url.rstrip("/"), timeout=timeout)
+        self._products: Optional[ProductsResource] = None
+        self._discounts: Optional[DiscountsResource] = None
+        self._payments: Optional[PaymentsResource] = None
 
     def __enter__(self) -> "AnanasClient":
         return self
@@ -66,31 +75,62 @@ class AnanasClient:
         if not all((self.api_key, self.client_id, self.client_secret)):
             raise ValueError("client credentials are required to request a token")
 
+        request = TokenRequest(
+            clientId=self.client_id,
+            clientSecret=self.client_secret,
+            scope=self.scope,
+        )
         response = self._client.post(
             self.TOKEN_PATH,
             headers={"X-API-Key": self.api_key},
-            json={
-                "grantType": "CLIENT_CREDENTIALS",
-                "clientId": self.client_id,
-                "clientSecret": self.client_secret,
-                "scope": self.scope,
-            },
+            json=request.to_payload(),
         )
         if not response.is_success:
             raise AnanasAuthenticationError(response)
 
-        payload = response.json()
-        token = payload.get("access_token")
-        if not isinstance(token, str) or not token:
-            raise AnanasAuthenticationError(response)
+        try:
+            payload = TokenResponse.model_validate(response.json())
+        except (ValueError, TypeError) as error:
+            raise AnanasAuthenticationError(response) from error
 
-        expires_in = payload.get("expires_in", 0)
-        self._access_token = token
-        if isinstance(expires_in, (int, float)) and expires_in > 0:
-            self._token_expires_at = time.monotonic() + max(0, expires_in - 30)
+        self._access_token = payload.access_token
+        if payload.expires_in > 0:
+            self._token_expires_at = time.monotonic() + max(0, payload.expires_in - 30)
         else:
             self._token_expires_at = None
-        return token
+        return payload.access_token
+
+    @property
+    def products(self) -> ProductsResource:
+        """Named product operations."""
+        if self._products is None:
+            from .resources.products import ProductsResource
+
+            self._products = ProductsResource(self)
+        return self._products
+
+    @property
+    def discounts(self) -> DiscountsResource:
+        """Named discount operations."""
+        if self._discounts is None:
+            from .resources.discounts import DiscountsResource
+
+            self._discounts = DiscountsResource(self)
+        return self._discounts
+
+    @property
+    def payments(self) -> PaymentsResource:
+        """Named warehouse, invoice, and payment operations."""
+        if self._payments is None:
+            from .resources.payments import PaymentsResource
+
+            self._payments = PaymentsResource(self)
+        return self._payments
+
+    @property
+    def warehouses(self) -> PaymentsResource:
+        """Alias for operations containing merchant warehouses."""
+        return self.payments
 
     def request(self, method: str, path: str, **kwargs: Any) -> JSON:
         """Send an authenticated request and return its decoded response body."""

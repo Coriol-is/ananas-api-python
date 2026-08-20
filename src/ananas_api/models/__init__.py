@@ -1,0 +1,86 @@
+"""Typed request and response models for the Ananas API."""
+
+from .auth import TokenRequest, TokenResponse
+from .base import APIModel, APIResponseModel
+from .discounts import (
+    GetDiscountPricesResponse,
+    ScheduleDiscountsRequest,
+    ScheduleDiscountsResponse,
+    UpdateDiscountsRequest,
+    UpdateDiscountsResponse,
+)
+from .payments import (
+    InvoiceCorrectionsResponse,
+    InvoicesResponse,
+    InvoiceURLsResponse,
+    MerchantWarehousesResponse,
+    PricesDataResponse,
+)
+from .products import (
+    CheckIfEANExistsRequest,
+    CheckIfEANExistsResponse,
+    ImportProductsResponse,
+    ProductsBasicResponse,
+    ProductsRequest,
+    ProductsResponse,
+    ProductTypesResponse,
+    UpdateProductRequest,
+    UpdateProductsRequest,
+    UpdateProductsResponse,
+    UpdateSingleProductResponse,
+)
+
+OPENAPI_SCHEMA_MODELS = {
+    "Token": TokenRequest,
+    "ProductsRequest": ProductsRequest,
+    "UpdateProductRequest": UpdateProductRequest,
+    "UpdateProductsRequest": UpdateProductsRequest,
+    "CheckIfEANExistsRequest": CheckIfEANExistsRequest,
+    "ScheduleDiscountsRequest": ScheduleDiscountsRequest,
+    "UpdateDiscountsRequest": UpdateDiscountsRequest,
+    "TokenResponse": TokenResponse,
+    "ProductTypesResponse": ProductTypesResponse,
+    "ProductsResponse": ProductsResponse,
+    "ProductsBasicResponse": ProductsBasicResponse,
+    "ImportProductsResponse": ImportProductsResponse,
+    "UpdateSingleProductResponse": UpdateSingleProductResponse,
+    "UpdateProductsResponse": UpdateProductsResponse,
+    "MerchantWarehousesResponse": MerchantWarehousesResponse,
+    "CheckIfEANExistsResponse": CheckIfEANExistsResponse,
+    "InvoicesResponse": InvoicesResponse,
+    "InvoiceCorrectionsResponse": InvoiceCorrectionsResponse,
+    "ScheduleDiscountsResponse": ScheduleDiscountsResponse,
+    "UpdateDiscountsResponse": UpdateDiscountsResponse,
+    "GetDiscountPricesResponse": GetDiscountPricesResponse,
+    "PricesDataResponse": PricesDataResponse,
+    "InvoiceURLsResponse": InvoiceURLsResponse,
+}
+
+__all__ = [
+    "APIModel",
+    "APIResponseModel",
+    "CheckIfEANExistsRequest",
+    "CheckIfEANExistsResponse",
+    "ImportProductsResponse",
+    "GetDiscountPricesResponse",
+    "InvoiceCorrectionsResponse",
+    "InvoiceURLsResponse",
+    "InvoicesResponse",
+    "MerchantWarehousesResponse",
+    "OPENAPI_SCHEMA_MODELS",
+    "PricesDataResponse",
+    "ProductTypesResponse",
+    "ProductsBasicResponse",
+    "ProductsRequest",
+    "ProductsResponse",
+    "ScheduleDiscountsRequest",
+    "ScheduleDiscountsResponse",
+    "TokenRequest",
+    "TokenResponse",
+    "UpdateDiscountsRequest",
+    "UpdateDiscountsResponse",
+    "UpdateProductRequest",
+    "UpdateProductsRequest",
+    "UpdateProductsResponse",
+    "UpdateSingleProductResponse",
+]
