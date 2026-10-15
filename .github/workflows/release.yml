@@ -11,7 +11,7 @@ permissions:
 jobs:
   build:
     name: Build distributions
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
       id-token: write
@@ -43,7 +43,7 @@ jobs:
   github-release:
     name: Publish GitHub Release
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     permissions:
       contents: write
     steps:
@@ -59,7 +59,7 @@ jobs:
   pypi:
     name: Publish to PyPI
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     environment:
       name: pypi
       url: https://pypi.org/project/ananas-api-python/
